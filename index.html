@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Despachos · Distribuidora La Quinta</title>
+<style>
+:root{
+  --bg:#eef2f1; --panel:#ffffff; --ink:#14302e; --muted:#5d7270; --line:#d3dedc;
+  --brand:#0f5c57; --brand-ink:#ffffff;
+  --ok-bg:#dff3e4; --ok:#1b6b34;
+  --warn-bg:#fdf0c9; --warn:#7a5600;
+  --bad-bg:#fbdcd8; --bad:#9b2217;
+  --gray-bg:#e3e7e7; --gray:#3e4b4a;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0f1b1a; --panel:#172827; --ink:#e4efed; --muted:#93aaa7; --line:#2b4240;
+  --brand:#4fb8ae; --brand-ink:#08201e;
+  --ok-bg:#183a25; --ok:#8fe0a8; --warn-bg:#3d3112; --warn:#f2cf6b;
+  --bad-bg:#431c18; --bad:#ff9d92; --gray-bg:#26353a; --gray:#c5d3d2;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Segoe UI",system-ui,sans-serif}
+header{max-width:960px;margin:0 auto;padding:28px 20px 8px}
+h1{margin:0;font-size:1.6rem;font-weight:700;letter-spacing:-.01em}
+header p{margin:4px 0 0;color:var(--muted)}
+nav{max-width:960px;margin:16px auto 0;padding:0 20px;display:flex;gap:4px;border-bottom:1px solid var(--line)}
+nav button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 16px;font:inherit;font-weight:600;color:var(--muted);cursor:pointer}
+nav button[aria-selected="true"]{color:var(--brand);border-color:var(--brand)}
+main{max-width:960px;margin:0 auto;padding:20px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media(max-width:640px){.grid{grid-template-columns:1fr}}
+label{display:block;font-weight:600;font-size:.9rem;margin-bottom:4px}
+input,select{width:100%;padding:10px 12px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px}
+input:focus,select:focus,button:focus-visible{outline:3px solid var(--brand);outline-offset:1px}
+.actions{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{background:var(--brand);color:var(--brand-ink);border:0;border-radius:6px;padding:11px 22px;font:inherit;font-weight:700;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:wait}
+.btn.sec{background:transparent;color:var(--brand);border:1px solid var(--brand)}
+.casos{margin-top:18px;padding-top:16px;border-top:1px dashed var(--line);font-size:.9rem;color:var(--muted)}
+.casos button{margin:6px 6px 0 0;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:.85rem;cursor:pointer}
+#resultado{margin-top:20px;border-radius:10px;padding:18px 20px;display:none;border-left:8px solid}
+#resultado h2{margin:0 0 4px;font-size:1.25rem}
+#resultado p{margin:0}
+.r-APROBADO{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
+.r-ALERTA{background:var(--warn-bg);color:var(--warn);border-color:var(--warn)}
+.r-RECHAZADO{background:var(--bad-bg);color:var(--bad);border-color:var(--bad)}
+.r-NO_ENCONTRADO,.r-ERROR{background:var(--gray-bg);color:var(--gray);border-color:var(--gray)}
+.tabla{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.88rem;white-space:nowrap}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{font-size:.8rem;color:var(--muted)}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-weight:700;font-size:.8rem}
+.estado{color:var(--muted);font-size:.9rem;margin:0 0 12px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <h1>Control de despachos</h1>
+  <p>Distribuidora La Quinta S.A.S. · Cali</p>
+</header>
+<nav role="tablist">
+  <button role="tab" id="t-reg" aria-selected="true" aria-controls="v-reg">Registrar despacho</button>
+  <button role="tab" id="t-his" aria-selected="false" aria-controls="v-his">Historial de movimientos</button>
+</nav>
+
+<main>
+<section id="v-reg" role="tabpanel" class="panel">
+  <form id="form" autocomplete="off">
+    <div class="grid">
+      <div><label for="solicitante">Solicitante</label><input id="solicitante" required></div>
+      <div><label for="correo">Correo</label><input id="correo" type="email" required></div>
+      <div>
+        <label for="codigo">Código de producto</label>
+        <input id="codigo" list="productos" placeholder="INS-0101" required>
+        <datalist id="productos">
+          <option value="INS-0101">Harina de trigo x 25 kg</option>
+          <option value="INS-0102">Azúcar refinada x 50 kg</option>
+          <option value="INS-0203">Aceite vegetal x 20 L</option>
+          <option value="INS-0204">Arroz blanco x 25 kg</option>
+          <option value="INS-0305">Servilletas x 1000 u</option>
+          <option value="INS-0306">Vasos desechables 7 oz x 2500</option>
+          <option value="INS-0407">Pollo congelado x 10 kg</option>
+          <option value="INS-0408">Queso mozzarella x 5 kg</option>
+        </datalist>
+      </div>
+      <div><label for="cantidad">Cantidad</label><input id="cantidad" type="number" min="1" step="1" required></div>
+      <div><label for="destino">Destino</label><input id="destino" required></div>
+      <div>
+        <label for="motivo">Motivo</label>
+        <select id="motivo">
+          <option value="despacho">Despacho</option>
+          <option value="traslado entre sedes">Traslado entre sedes</option>
+          <option value="averia">Avería</option>
+        </select>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="enviar" type="submit">Registrar despacho</button>
+    </div>
+  </form>
+
+  <div class="casos">
+    Cargar datos de un caso de prueba:
+    <div id="casos"></div>
+  </div>
+
+  <div id="resultado" role="status" aria-live="polite"></div>
+</section>
+
+<section id="v-his" role="tabpanel" class="panel" hidden>
+  <div class="actions" style="margin:0 0 14px">
+    <button class="btn sec" id="recargar" type="button">Actualizar historial</button>
+  </div>
+  <p class="estado" id="estado"></p>
+  <div class="tabla"><table id="tabla"></table></div>
+</section>
+</main>
+
+<script>
+// ---- Configuración ----
+const WEBHOOK_URL = "https://hook.us2.make.com/dkyp75u4yipv7m1ttsuo9w1pcepq9ysy";
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSle0eNwOq7LYWXtS9aSjFQN-HU4j3pTcQrxmvUP43slDw0lZeUFEWl7t7_P4NFG0kvvF1Oon3NlMLQ/pub?gid=478177069&single=true&output=csv";
+
+const $ = id => document.getElementById(id);
+
+// ---- Pestañas ----
+function ver(tab){
+  const reg = tab === "reg";
+  $("v-reg").hidden = !reg; $("v-his").hidden = reg;
+  $("t-reg").setAttribute("aria-selected", reg);
+  $("t-his").setAttribute("aria-selected", !reg);
+  if(!reg) cargarHistorial();
+}
+$("t-reg").onclick = () => ver("reg");
+$("t-his").onclick = () => ver("his");
+
+// ---- Casos de prueba ----
+const CASOS = {
+  C1:{codigo:"INS-0101",cantidad:10}, C2:{codigo:"INS-0102",cantidad:5},
+  C3:{codigo:"INS-0407",cantidad:5},  C4:{codigo:"INS-9999",cantidad:3},
+  C5:{codigo:"INS-0204",cantidad:7}
+};
+for(const k in CASOS){
+  const b = document.createElement("button");
+  b.type = "button"; b.textContent = `${k}: ${CASOS[k].codigo} × ${CASOS[k].cantidad}`;
+  b.onclick = () => {
+    $("codigo").value = CASOS[k].codigo; $("cantidad").value = CASOS[k].cantidad;
+    if(!$("solicitante").value) $("solicitante").value = "Ana Pérez";
+    if(!$("correo").value) $("correo").value = "ana@correo.com";
+    if(!$("destino").value) $("destino").value = "Cafetería Centro";
+  };
+  $("casos").appendChild(b);
+}
+
+// ---- Envío al webhook ----
+const TITULOS = {
+  APROBADO:"Despacho aprobado", ALERTA:"Aprobado con alerta",
+  RECHAZADO:"Despacho rechazado", NO_ENCONTRADO:"Código no encontrado", ERROR:"No se pudo registrar"
+};
+function mostrar(tipo, mensaje, extra){
+  const r = $("resultado");
+  r.className = "r-" + tipo; r.style.display = "block";
+  r.innerHTML = "";
+  const h = document.createElement("h2"); h.textContent = TITULOS[tipo] || tipo;
+  const p = document.createElement("p");
+  p.textContent = mensaje + (extra !== undefined && extra !== null ? ` Saldo nuevo: ${extra}.` : "");
+  r.append(h, p);
+}
+
+$("form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const btn = $("enviar"); btn.disabled = true; btn.textContent = "Procesando…";
+  $("resultado").style.display = "none";
+  const datos = {
+    solicitante: $("solicitante").value.trim(),
+    correo: $("correo").value.trim(),
+    codigo_producto: $("codigo").value.trim().toUpperCase(),
+    cantidad: Number($("cantidad").value),
+    destino: $("destino").value.trim(),
+    motivo: $("motivo").value
+  };
+  try{
+    const resp = await fetch(WEBHOOK_URL, {
+      method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(datos)
+    });
+    const texto = await resp.text();
+    let j; try{ j = JSON.parse(texto); }catch{ j = null; }
+    if(j && j.resultado) mostrar(j.resultado, j.mensaje || "", j.saldo_nuevo);
+    else mostrar("ERROR", "El proceso respondió algo inesperado: " + texto.slice(0,120));
+  }catch(err){
+    mostrar("ERROR", "No hubo conexión con el proceso. Revisa que el escenario de Make esté activo.");
+  }
+  btn.disabled = false; btn.textContent = "Registrar despacho";
+});
+
+// ---- Historial desde CSV publicado ----
+function parseCSV(t){
+  const filas = []; let f = [], c = "", q = false;
+  for(let i=0;i<t.length;i++){
+    const ch = t[i];
+    if(q){
+      if(ch === '"' && t[i+1] === '"'){ c += '"'; i++; }
+      else if(ch === '"') q = false;
+      else c += ch;
+    } else if(ch === '"') q = true;
+    else if(ch === ","){ f.push(c); c = ""; }
+    else if(ch === "\n" || ch === "\r"){
+      if(ch === "\r" && t[i+1] === "\n") i++;
+      f.push(c); c = ""; filas.push(f); f = [];
+    } else c += ch;
+  }
+  if(c !== "" || f.length){ f.push(c); filas.push(f); }
+  return filas.filter(r => r.some(x => x.trim() !== ""));
+}
+
+async function cargarHistorial(){
+  const est = $("estado"), tabla = $("tabla");
+  est.textContent = "Cargando movimientos…"; tabla.innerHTML = "";
+  try{
+    const resp = await fetch(CSV_URL + "&t=" + Date.now());
+    if(!resp.ok) throw new Error(resp.status);
+    const filas = parseCSV(await resp.text());
+    if(filas.length < 2){ est.textContent = "Aún no hay movimientos registrados. Registra un despacho para verlo aquí."; return; }
+    const [enc, ...datos] = filas;
+    datos.reverse();
+    est.textContent = `${datos.length} movimiento(s). Google puede tardar unos minutos en reflejar el último.`;
+    const thead = tabla.createTHead().insertRow();
+    enc.forEach(h => { const th = document.createElement("th"); th.textContent = h; thead.appendChild(th); });
+    const tb = tabla.createTBody();
+    const iRes = enc.indexOf("resultado");
+    const numericas = ["cantidad","saldo_anterior","saldo_nuevo","minimo"].map(x => enc.indexOf(x));
+    datos.forEach(fila => {
+      const tr = tb.insertRow();
+      enc.forEach((_, i) => {
+        const td = tr.insertCell(); const v = fila[i] || "";
+        if(i === iRes){
+          const s = document.createElement("span");
+          s.className = "pill r-" + v; s.textContent = v; td.appendChild(s);
+        } else { td.textContent = v; if(numericas.includes(i)) td.className = "num"; }
+      });
+    });
+  }catch(err){
+    est.textContent = "No se pudo leer el historial. Revisa que la hoja siga publicada como CSV.";
+  }
+}
+$("recargar").onclick = cargarHistorial;
+</script>
+</body>
+</html>
